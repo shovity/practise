@@ -47,8 +47,24 @@ window.store = new Proxy(
     {
         state: Object.create(null),
 
-        watch() {
-            
+        init() {
+            for (const name of ['change', 'keyup']) {
+                window.addEventListener(name, ({ target }) => {
+                    const key = target.getAttribute('store-bind')
+    
+                    if (!key) {
+                        return
+                    }
+    
+                    if (target.type === 'checkbox') {
+                        window.store[key] = target.checked
+                    } else if (target.type === 'radio') {
+                        window.store[key] = target.name
+                    } else {
+                        window.store[key] = target.value
+                    }
+                })
+            }
         }
     },
     {
@@ -58,25 +74,24 @@ window.store = new Proxy(
 
         set(target, key, value) {
             for (const dom of document.querySelectorAll(`[store-bind="${key}"]`)) {
-                const tagName = dom.tagName
-        
-                if (['INPUT', 'TEXTAREA', 'SELECT'].indexOf(tagName) !== -1) {
-                    if (dom.type === 'checkbox' || dom.type === 'radio') {
-                        dom.checked = value
-                    } else {
+                switch (dom.tagName) {
+                    case 'INPUT':
+                    case 'TEXTAREA':
+                    case 'SELECT':
+                        if (dom.type === 'checkbox' || dom.type === 'radio') {
+                            dom.checked = value
+                            break
+                        }
+
                         dom.value = value
-                    }
-                } else if (tagName === 'IMG') {
-                    dom.src = value
-                } else {
-                    dom.innerHTML = value
+                        break
+                
+                    default:
+                        dom.innerHTML = value
                 }
             }
         
-            const oldValue = target.state[key]
             target.state[key] = value
-            event.emit('store_setted', { key, value, oldValue })
-        
             return true
         }
     },
@@ -88,3 +103,5 @@ window.store = new Proxy(
 Array.prototype.sample = function () {
     return this[Math.floor(Math.random() * this.length)]
 }
+
+store.origin.init()
