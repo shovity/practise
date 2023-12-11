@@ -21,7 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
     })
 
     store.score = 0
-    add()
-    add()
-    add()
+    
+    for (let i = 0; i < (+window.query.n || 1); i++) {
+        add()
+    }
 })

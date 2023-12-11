@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const start = async () => {
         store.score = 0
 
-        for (let i = 0; i < 3; i++) {
+        for (let i = 0; i < (+window.query.n || 1); i++) {
             add()
         }
     }

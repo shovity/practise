@@ -105,3 +105,8 @@ Array.prototype.sample = function () {
 }
 
 store.origin.init()
+
+window.query = location.search.slice(1).split('&').map(p => p.split('=')).reduce((pre, cur) => {
+    pre[cur[0]] = cur[1]
+    return pre
+}, {})
